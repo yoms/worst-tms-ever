@@ -22,5 +22,7 @@ http://localhost:5000/{x}/{y}/{z}
 The request can take a long time, if the data was not already computed the wtmse will download the data and process the tile.
 
 # TODO
+
 [ ] Defnie the generator requested in the request
+
 [ ] Pass argument to improve the wtmse (date of image, color clip, band used)
