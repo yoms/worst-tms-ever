@@ -1,4 +1,4 @@
-#Worst TMS EVER
+# Worst TMS EVER
 
 This python flask server, serv TMS data from copernicus raster, its the worst TMS cause the computing time long and requests going in time out.
 
@@ -6,7 +6,7 @@ This python flask server, serv TMS data from copernicus raster, its the worst TM
 
 Unzip ./generator/sentinel2/utils/data/S2A_OPER.kml.zip before use
 
-##Once launch
+## Once launch
 
 Server will be launch on port 5000
 
