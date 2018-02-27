@@ -23,6 +23,5 @@ The request can take a long time, if the data was not already computed the wtmse
 
 # TODO
 
-[ ] Defnie the generator requested in the request
-
-[ ] Pass argument to improve the wtmse (date of image, color clip, band used)
+- [] Defnie the generator requested in the request
+- [] Pass argument to improve the wtmse (date of image, color clip, band used)
