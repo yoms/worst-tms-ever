@@ -32,4 +32,4 @@ def get_request_handler(generator_name, x_coordinate, y_coordinate, z_coordinate
 
 if __name__ == '__main__':
     LOGGER.setLevel(logging.DEBUG)
-    APP.run()
+    APP.run(host= '0.0.0.0')
