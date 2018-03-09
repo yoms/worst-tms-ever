@@ -10,7 +10,7 @@ class Generator(abc.ABC):
     """
 
     @abc.abstractmethod
-    def generate_tile(self, tms_x, tms_y, tms_z):
+    def generate_tile(self, tms_x, tms_y, tms_z, arguments):
         """
         Generate tile for the given x, y, z
         """

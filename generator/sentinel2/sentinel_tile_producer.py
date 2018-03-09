@@ -13,11 +13,15 @@ class Tile:
     """
     Tile class, represent a tile request
     """
-    def __init__(self, zone_name, found_date, bbox, file_path):
+    def __init__(self, zone_name, found_date, bbox, file_path, bands, first_clip, second_clip, third_clip):
         self.zone_name = zone_name
         self.found_date = found_date
         self.bbox = bbox
         self.file_path = file_path
+        self.bands = bands
+        self.first_clip = first_clip
+        self.second_clip = second_clip
+        self.third_clip = third_clip
 
 
 class SentinelTileProducer(Thread):
@@ -50,26 +54,35 @@ class SentinelTileProducer(Thread):
             found_date = tile.found_date
             bbox = tile.bbox
             file_path = tile.file_path
+            tile_bands = tile.bands
+            first_clip = tile.first_clip
+            second_clip = tile.second_clip
+            third_clip = tile.third_clip
 
             if not os.path.isfile(file_path):
-                bands = download_product_in_zone(zone_name, found_date)
+                bands = download_product_in_zone(zone_name, found_date, tile_bands)
                 tiff_name = zone_name + "_" + \
                     str(found_date.year) + "_" + \
-                    str(found_date.month) + "_" + str(found_date.day)
+                    str(found_date.month) + "_" + str(found_date.day) + \
+                    "_"+str(tile_bands[0])+"_"+str(tile_bands[1])+"_"+str(tile_bands[2])
                 tiff_path = os.path.join(tempfile.gettempdir(), tiff_name)
 
                 if not os.path.isfile(tiff_path):
                     create_raster_from_band(
-                        bands[4], bands[3], bands[2], tiff_path)
+                        bands[tile_bands[0]], bands[tile_bands[1]], bands[tile_bands[2]], tiff_path)
 
                 big_png_name = zone_name + "_" + \
                     str(found_date.year) + "_" + str(found_date.month) + \
-                    "_" + str(found_date.day) + ".png"
+                    "_" + str(found_date.day) + \
+                    "_"+str(tile_bands[0])+"_"+str(tile_bands[1])+"_"+str(tile_bands[2])+ \
+                    "_"+str(first_clip[0])+"_"+str(first_clip[1])+ \
+                    "_"+str(second_clip[0])+"_"+str(second_clip[1])+ \
+                    "_"+str(third_clip[0])+"_"+str(third_clip[1])+ \
+                    ".png"
                 big_png_path = os.path.join(
                     tempfile.gettempdir(), big_png_name)
                 if not os.path.isfile(big_png_path):
-                    create_png_from_raster(tiff_path, big_png_path, red_clip=(
-                        0, 2500), blue_clip=(0, 2500), green_clip=(0, 2500))
+                    create_png_from_raster(tiff_path, big_png_path, first_clip, second_clip, third_clip)
 
                 x_min, y_min = get_x_y_for_lon_lat(
                     tiff_path, bbox[0][0], bbox[0][1])
