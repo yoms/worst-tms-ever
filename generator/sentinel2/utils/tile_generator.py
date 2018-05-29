@@ -5,7 +5,7 @@ import tempfile
 import scipy.misc
 import numpy as np
 from skimage.transform import resize, rotate
-from math import atan, degrees, tan , floor
+from math import atan, degrees, tan , floor, fabs
 from osgeo import gdal, osr, ogr
 
 logging.basicConfig(level=logging.DEBUG)
@@ -210,6 +210,7 @@ def extract_tile(img_path, top_left, top_right, bottom_left, bottom_right, out_p
     rgb[..., 2] = img[y_min:y_max, x_min:x_max, 2]
     LOGGER.debug("Write tile in output file %s", out_path)
     transformed_img = rotate(rgb, -rotation_angle_degrees, resize=True, clip=False)
+    opposite_lenght = int(fabs(opposite_lenght))
     y_clip = opposite_lenght
     x_clip = opposite_lenght 
     
