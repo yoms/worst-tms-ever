@@ -70,6 +70,9 @@ class SentinelTileGenerator(Generator):
         """
         generate tile implementation, use an sentinel tile producer to treat data
         """
+        if (tms_z < 9) or (tms_z > 12):
+            LOGGER.debug("Image shall be between 9 < z < 12 ")
+            return self.__blank_file
         bbox = bbox_from_xyz(tms_x, tms_y, tms_z)
         zone_top = find_zone(ZONES_FEATURES, bbox[0][0], bbox[0][1])
         zone_bottom = find_zone(ZONES_FEATURES, bbox[1][0], bbox[1][1])
@@ -98,7 +101,7 @@ class SentinelTileGenerator(Generator):
 
             tile = Tile(zone_name, found_date, bbox, file_path, bands, first_clip, second_clip, third_clip)
             SENTINE_PRODUCER_INSTANCE.produce_request(tile)
-            time.sleep(10)
+            time.sleep(60)
             if os.path.isfile(file_path):
                 return file_path
         return self.__blank_file
