@@ -47,4 +47,11 @@ def bbox_from_xyz(tms_x, tms_y, tms_z):
 
 
 if __name__ == '__main__':
+    print(bbox_from_xyz(16540.0, 11963.0, 15))  # 1.71410,43.61998
     print(bbox_from_xyz(16540.0, 11964.0, 15))  # 1.71410,43.61998
+    print(bbox_from_xyz(16540.0, 11965.0, 15))  # 1.71410,43.61998
+
+
+    print(bbox_from_xyz(16540.0, 11963.0, 15))  # 1.71410,43.61998
+    print(bbox_from_xyz(16541.0, 11963.0, 15))  # 1.71410,43.61998
+    print(bbox_from_xyz(16542.0, 11963.0, 15))  # 1.71410,43.61998

@@ -84,12 +84,16 @@ class SentinelTileProducer(Thread):
                 if not os.path.isfile(big_png_path):
                     create_png_from_raster(tiff_path, big_png_path, first_clip, second_clip, third_clip)
 
-                x_min, y_min = get_x_y_for_lon_lat(
+                top_left = get_x_y_for_lon_lat(
                     tiff_path, bbox[0][0], bbox[0][1])
-                x_max, y_max = get_x_y_for_lon_lat(
+                top_rigth = get_x_y_for_lon_lat(
+                    tiff_path, bbox[0][0], bbox[1][1])
+                bottom_left = get_x_y_for_lon_lat(
+                    tiff_path, bbox[1][0], bbox[0][1])
+                bottom_right = get_x_y_for_lon_lat(
                     tiff_path, bbox[1][0], bbox[1][1])
-                extract_tile(big_png_path, x_min, y_max,
-                             x_max, y_min, file_path)
+                extract_tile(big_png_path, top_left, top_rigth,
+                             bottom_left, bottom_right, file_path)
 
 
 SENTINE_PRODUCER_INSTANCE = SentinelTileProducer()

@@ -4,6 +4,8 @@ import logging
 import tempfile
 import scipy.misc
 import numpy as np
+from skimage.transform import resize, rotate
+from math import atan, degrees, tan , floor
 from osgeo import gdal, osr, ogr
 
 logging.basicConfig(level=logging.DEBUG)
@@ -134,19 +136,50 @@ def get_x_y_for_lon_lat(raster_file, lon, lat):
     point_x = (point_x - ulx) / xres
     point_y = (point_y - uly) / yres
 
+    point_x = floor(point_x) if point_x-floor(point_x) < 0.5 else floor(point_x + 1)
+    point_y = floor(point_y) if point_y-floor(point_y) < 0.5 else floor(point_y + 1)
+    LOGGER.debug("Point x : %s", point_x)
+    LOGGER.debug("Point y : %s", point_y)
+
     return (int(point_x), int(point_y))
 
-def extract_tile(img_path, x_min, y_min, x_max, y_max, out_path):
+def extract_tile(img_path, top_left, top_right, bottom_left, bottom_right, out_path, x_out_size = 512, y_out_size = 512):
     """
     Extract tile from the image
     """
+
+
+    LOGGER.debug("Top left     : %s", top_left)
+    LOGGER.debug("Top right    : %s", top_right)
+    LOGGER.debug("Bottom Left  : %s", bottom_left)
+    LOGGER.debug("Bottom Right : %s", bottom_right)
+
+    opposite_lenght = top_left[0]-top_right[0]
+    adjacent_lenght = top_left[1]-top_right[1]
+    rotation_angle_tan = atan((opposite_lenght)/(adjacent_lenght))
+    rotation_angle_degrees = degrees(rotation_angle_tan)
+
+    LOGGER.debug("Opposite lenght: %s", opposite_lenght)
+    LOGGER.debug("Adjacent lenght: %s", adjacent_lenght)
+    LOGGER.debug("Rotation  angle: %s", rotation_angle_degrees)
+
+    x_min = min(top_left[0], top_right[0], bottom_left[0], bottom_right[0])
+    y_min = min(top_left[1], top_right[1], bottom_left[1], bottom_right[1])
+    x_max = max(top_left[0], top_right[0], bottom_left[0], bottom_right[0])
+    y_max = max(top_left[1], top_right[1], bottom_left[1], bottom_right[1])
+
+    y_clip  = int((y_max - y_min)*tan(rotation_angle_tan))
+    x_clip  = int((x_max - x_min)*tan(rotation_angle_tan))
+
     LOGGER.debug("Extract tile")
+    LOGGER.debug("Image path : %s", img_path)
     LOGGER.debug("Extract data from table")
     LOGGER.debug("Min x : %s", x_min)
     LOGGER.debug("Max x : %s", x_max)
     LOGGER.debug("Min y : %s", y_min)
     LOGGER.debug("Max y : %s", y_max)
     img = scipy.misc.imread(img_path)
+
 
     y_min = max(0, min(y_min, len(img)))
     y_max = max(0, min(y_max, len(img)))
@@ -168,10 +201,43 @@ def extract_tile(img_path, x_min, y_min, x_max, y_max, out_path):
     if x_max == x_min:
         LOGGER.error("After clamp, image size is Null")
         return False
-    rgb = np.zeros((y_max - y_min, x_max - x_min, 3), dtype=np.uint8)
+    size_on_x = (x_max - x_min)
+    size_on_y = (y_max - y_min)
+
+    rgb = np.zeros((size_on_y, size_on_x, 3), dtype=np.uint8)
     rgb[..., 0] = img[y_min:y_max, x_min:x_max, 0]
     rgb[..., 1] = img[y_min:y_max, x_min:x_max, 1]
     rgb[..., 2] = img[y_min:y_max, x_min:x_max, 2]
     LOGGER.debug("Write tile in output file %s", out_path)
-    scipy.misc.imsave(out_path, rgb)
+    transformed_img = rotate(rgb, -rotation_angle_degrees, resize=True, clip=False)
+    y_clip = opposite_lenght
+    x_clip = opposite_lenght 
+    
+    LOGGER.debug("After rotation opposite lenght: %s", y_clip)
+    LOGGER.debug("After rotation opposite lenght: %s", x_clip)
+
+    LOGGER.debug("Size on y after rotation: %s", len(transformed_img))
+    LOGGER.debug("Size on x after rotation: %s", len(transformed_img[0]))
+
+    LOGGER.debug("Size on y before rotation: %s", size_on_y)
+    LOGGER.debug("Size on x before rotation: %s", size_on_x)
+
+    y_max_cliped = size_on_y-y_clip
+    x_max_cliped = size_on_x-x_clip
+    rgb_cliped = transformed_img[y_clip:y_max_cliped, x_clip:x_max_cliped, :]
+    LOGGER.debug("Size on y after clip: %s", len(rgb_cliped))
+    LOGGER.debug("Size on x after clip: %s", len(rgb_cliped[0]))
+    scipy.misc.imsave(out_path, resize(rgb_cliped, (x_out_size,y_out_size)))
     return True
+
+def main():
+    Topleft=(8514, 6139)
+    Topright=(8499, 5780)
+    BottomLeft=(8873, 6124)
+    BottomRight=(8858, 5765)
+
+    extract_tile('/tmp/30TYN_2018_3_2_2_3_4_0.0_2500.0_0.0_2500.0_0.0_2500.0.png', Topleft, Topright, BottomLeft, BottomRight, '/tmp/extract.png')
+    
+
+if __name__ == '__main__':
+    main()
