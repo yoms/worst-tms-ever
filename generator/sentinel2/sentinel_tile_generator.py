@@ -10,13 +10,13 @@ from datetime import date
 from generator.generator_factory import Generator
 from utils.tms_helper import bbox_from_xyz
 from .utils.sentinel_downloader import read_zones_from_data_file, find_zone, last_image_date_for_zone
-from .sentinel_tile_producer import Tile, SENTINE_PRODUCER_INSTANCE
+from .sentinel_tile_producer import Tile, SENTINEL_PRODUCER_INSTANCE
 
 
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger("wtmse")
 ZONES_FEATURES = read_zones_from_data_file()
-
+MAXIMUM_SLEEP = 60
 
 class SentinelTileGenerator(Generator):
     """
@@ -100,8 +100,13 @@ class SentinelTileGenerator(Generator):
                 return file_path
 
             tile = Tile(zone_name, found_date, bbox, file_path, bands, first_clip, second_clip, third_clip)
-            SENTINE_PRODUCER_INSTANCE.produce_request(tile)
-            time.sleep(60)
+            SENTINEL_PRODUCER_INSTANCE.produce_request(tile)
+
+            actual_sleep = 0
+            while not os.path.exists(file_path) and actual_sleep < MAXIMUM_SLEEP:
+                time.sleep(1)
+                actual_sleep = actual_sleep + 1
+
             if os.path.isfile(file_path):
                 return file_path
         return self.__blank_file
