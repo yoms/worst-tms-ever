@@ -103,3 +103,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Sentinel Data
+generator/sentinel2/utils/data/S2A_OPER.kml
