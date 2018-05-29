@@ -224,6 +224,9 @@ def extract_tile(img_path, top_left, top_right, bottom_left, bottom_right, out_p
 
     y_max_cliped = size_on_y-y_clip
     x_max_cliped = size_on_x-x_clip
+
+    x_max_cliped = max(x_max_cliped, y_max_cliped)+opposite_lenght
+    y_max_cliped = x_max_cliped
     rgb_cliped = transformed_img[y_clip:y_max_cliped, x_clip:x_max_cliped, :]
     LOGGER.debug("Size on y after clip: %s", len(rgb_cliped))
     LOGGER.debug("Size on x after clip: %s", len(rgb_cliped[0]))
@@ -236,7 +239,11 @@ def main():
     BottomLeft=(8873, 6124)
     BottomRight=(8858, 5765)
 
-    extract_tile('/tmp/30TYN_2018_3_2_2_3_4_0.0_2500.0_0.0_2500.0_0.0_2500.0.png', Topleft, Topright, BottomLeft, BottomRight, '/tmp/extract.png')
+    print(get_x_y_for_lon_lat("/home/ghormiere/Téléchargements/TCI.jp2", 1.433333, 43.600000))
+    print(get_x_y_for_lon_lat("/home/ghormiere/Téléchargements/TCI.jp2", 1.433333, 43.700000))
+    print(get_x_y_for_lon_lat("/home/ghormiere/Téléchargements/TCI.jp2", 1.533333, 43.700000))
+    print(get_x_y_for_lon_lat("/home/ghormiere/Téléchargements/TCI.jp2", 1.533333, 43.600000))
+    # extract_tile('/tmp/30TYN_2018_3_2_2_3_4_0.0_2500.0_0.0_2500.0_0.0_2500.0.png', Topleft, Topright, BottomLeft, BottomRight, '/tmp/extract.png')
     
 
 if __name__ == '__main__':
