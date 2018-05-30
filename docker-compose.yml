@@ -1,0 +1,12 @@
+version: '2'
+services:
+  wtmse:
+    image: "yoms/worst-tms-ever"
+    ports:
+     - "5000:5000"
+  leaflet:
+    image: "yoms/nginx-leaflet"
+    ports: 
+     - "8080:80"
+    environment: 
+     - "TILESERVER=http://localhost:5000/sentinel2/{x}/{y}/{z}"
