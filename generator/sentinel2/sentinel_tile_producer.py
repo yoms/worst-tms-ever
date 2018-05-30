@@ -34,6 +34,7 @@ class SentinelImageProducer(Thread):
     """
 
     tile_to_product = Queue()
+    __sentinel_tile_produce_instance = None
 
     def __init__(self):
         """
@@ -47,6 +48,13 @@ class SentinelImageProducer(Thread):
         Add a tile request in the queue
         """
         SentinelImageProducer.tile_to_product.put(tile)
+        if SentinelImageProducer.__sentinel_tile_produce_instance == None:
+            SentinelImageProducer.__sentinel_tile_produce_instance = SentinelImageProducer()
+            SentinelImageProducer.__sentinel_tile_produce_instance.start()
+
+            for i in range(0,5):
+                tile_producer = SentinelTileProducer()
+                tile_producer.start()
 
     def run(self):
         """
@@ -165,10 +173,3 @@ class SentinelTileProducer(Thread):
             except Exception as err:
                 LOGGER.error("Something wrong happen during tile generation, maybe you should try to develop real code")
 
-
-SENTINEL_PRODUCER_INSTANCE = SentinelImageProducer()
-SENTINEL_PRODUCER_INSTANCE.start()
-
-for i in range(0,5):
-    tile_producer = SentinelTileProducer()
-    tile_producer.start()

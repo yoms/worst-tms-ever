@@ -50,8 +50,6 @@ def find_zone(zones_features, longitude, latitude):
     """
     Find zone for lat long
     """
-    print(longitude)
-    print(latitude)
     top_x = int(longitude)
     top_y = int(latitude)
     if top_x in zones_features:
@@ -73,6 +71,9 @@ def get_url_for_zone(zone_name):
     """
     Return url for th given zone
     """
+    if len(zone_name) < 5:
+        LOGGER.debug("Impossible to build url from zone_name %s", zone_name)
+        return ""
     utm_code = zone_name[:2]
     lat_band = zone_name[2]
     square = zone_name[-2:]

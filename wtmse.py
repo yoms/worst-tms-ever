@@ -9,6 +9,8 @@ from flask import Flask
 from flask import send_file
 from flask import request
 from generator.generator_factory import GeneratorFactory
+from utils.exception import DataCannotBeComputed, DataNotYetReady
+
 
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger("wtmse")
@@ -26,8 +28,20 @@ def get_request_handler(generator_name, x_coordinate, y_coordinate, z_coordinate
     LOGGER.debug("Generator name: %s", generator_name)
     LOGGER.debug("Request args  : %s", request.args)
     generator = GeneratorFactory.get_instance().build_generator(generator_name)
-    tile = generator.generate_tile(x_coordinate, y_coordinate, z_coordinate, request.args)
-    return send_file(tile, mimetype='image/png')
+    try:
+        tile = generator.generate_tile(x_coordinate, y_coordinate, z_coordinate, request.args)
+        LOGGER.debug("File found, file %s", tile)
+        return send_file(tile, mimetype='image/png')
+    except DataCannotBeComputed as err:
+        tile = generator.get_error_file()
+        LOGGER.debug("File cannot be found, return error file %s", tile)
+        return send_file(tile, mimetype='image/png', cache_timeout=10)
+    except DataNotYetReady as err:
+        tile = generator.get_data_not_yet_ready_file()
+        LOGGER.debug("File not yet ready, return error file %s", tile)
+        return send_file(tile, mimetype='image/png', cache_timeout=10)
+    except Exception as err:
+        return 404
 
 
 if __name__ == '__main__':

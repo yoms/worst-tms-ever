@@ -3,4 +3,4 @@ from generator.sentinel2.sentinel_tile_generator import SentinelTileGenerator
 from generator.sentinel2.sentinel_tile_producer import SentinelTileProducer
 
 generator_factory = generator_factory.GeneratorFactory.get_instance()
-generator_factory.register_generator(SentinelTileGenerator())
+generator_factory.register_generator(SentinelTileGenerator)

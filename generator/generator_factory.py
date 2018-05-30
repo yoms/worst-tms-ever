@@ -23,6 +23,20 @@ class Generator(abc.ABC):
         """
         pass
 
+    @abc.abstractmethod
+    def get_error_file(self):
+        """
+        Return product type string
+        """
+        pass
+
+    @abc.abstractmethod
+    def get_data_not_yet_ready_file(self):
+        """
+        Return product type string
+        """
+        pass
+
 
 class GeneratorFactory:
     """
@@ -42,13 +56,14 @@ class GeneratorFactory:
         """
         register a generator in the generator factory
         """
-        self.generator_map[generator.product_type()] = generator
+        product_type = generator().product_type()
+        self.generator_map[product_type] = generator
 
     def build_generator(self, product_type):
         """
         return the generator for the given type
         """
-        return self.generator_map[product_type]
+        return self.generator_map[product_type]()
 
     @staticmethod
     def get_instance():
