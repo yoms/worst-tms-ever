@@ -26,7 +26,7 @@ The processing can be configure by the request:
 
 <http://localhost:5000/sentinel2/{x}/{y}/{z}?first_clip=500,8500&third_clip=500,8500&second_clip=500,8500>
 
-#Docker-compose
+## Docker-compose
 
 Use docker-compose for testing:
 
