@@ -7,3 +7,6 @@ class DataNotYetReady(Exception):
 class DataCannotBeComputed(Exception):
     """Base class for all exceptions in storm engine"""
     pass
+class GeneratorNotFound(Exception):
+    """Base class for all exceptions in storm engine"""
+    pass
