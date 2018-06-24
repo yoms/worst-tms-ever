@@ -5,7 +5,9 @@ ZONES_FEATURES = read_zones_from_data_file()
 
 @pytest.mark.parametrize("lat,long,zone_name", [
     (-116.015625,50.51342652633956,None),
-    (43.600000,1.433333,  "31TCJ")
+    (43.600000,1.433333,  "31TCJ"),
+    (-115.6640625, 51.39920565355378,None),
+    (-115.3125, 51.6180165487737, None)
 ]
 )
 def test_find_zone(lat,long,zone_name):
