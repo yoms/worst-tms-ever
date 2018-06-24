@@ -6,6 +6,7 @@ import time
 import logging
 import os
 import tempfile
+import datetime
 from datetime import date
 from generator.generator_factory import Generator
 from utils.tms_helper import bbox_from_xyz
@@ -17,7 +18,7 @@ from .sentinel_tile_producer import Tile, SentinelImageProducer
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger("wtmse")
 ZONES_FEATURES = read_zones_from_data_file()
-MAXIMUM_SLEEP = 0
+MAXIMUM_SLEEP = 60
 
 class SentinelTileGenerator(Generator):
     """
@@ -62,6 +63,8 @@ class SentinelTileGenerator(Generator):
         first_clip = (0., 2500.)
         second_clip = first_clip
         third_clip = first_clip
+        zone_name = None
+        date_requested = None
 
         if 'bands' in arguments:
             bands = list(map(int,arguments.get('bands', '2,3,4').split(',')))
@@ -75,41 +78,50 @@ class SentinelTileGenerator(Generator):
         second_clip = parse_clip('second_clip')
         third_clip = parse_clip('third_clip')
 
-        return bands, first_clip, second_clip, third_clip
+        if "zone" in arguments:
+            zone_name=arguments.get("zone")
+        
+        if "date" in arguments:
+            date_requested = arguments.get("date")
+            date_requested = datetime.datetime.strptime(date_requested, '%Y%m%d').date()
+
+        return bands, first_clip, second_clip, third_clip, zone_name, date_requested
         
     def generate_tile(self, tms_x, tms_y, tms_z, arguments):
         """
         generate tile implementation, use an sentinel tile producer to treat data
         """
-        if (tms_z < 9) or (tms_z > 12):
-            LOGGER.debug("Image shall be between 9 < z < 12 ")
-            raise DataCannotBeComputed("Image shall be between 9 < z < 12 ")
+        if (tms_z < 9) or (tms_z > 14):
+            LOGGER.debug("Image shall be between 9 < z < 14 ")
+            raise DataCannotBeComputed("Image shall be between 9 < z < 14 ")
         bbox = bbox_from_xyz(tms_x, tms_y, tms_z)
         zone_top = find_zone(ZONES_FEATURES, bbox[0][0], bbox[0][1])
         zone_bottom = find_zone(ZONES_FEATURES, bbox[1][0], bbox[1][1])
         if zone_bottom is None or zone_top is None:
-            raise DataCannotBeComputed("Image shall be between 9 < z < 12 ")
+            raise DataCannotBeComputed("Impossible to find zone ")
         LOGGER.debug("Zone top: %s", zone_top.name)
         LOGGER.debug("Zone bottom: %s", zone_bottom.name)
 
         if zone_top.name == zone_bottom.name:
-            zone_name = zone_top.name
             found_date = None
 
-            bands, first_clip, second_clip, third_clip = self.parse_arguments(arguments)
+            bands, first_clip, second_clip, third_clip, zone_name, found_date = self.parse_arguments(arguments)
 
-            if zone_top.name not in SentinelTileGenerator.__last_date_for_today:
-                    found_date = last_image_date_for_zone(zone_name)
-                    SentinelTileGenerator.__last_date_for_today[zone_top.name] = (date.today(),found_date)
-            else:
-                if SentinelTileGenerator.__last_date_for_today[zone_top.name][0] != date.today():
-                    found_date = last_image_date_for_zone(zone_name)
-                    SentinelTileGenerator.__last_date_for_today[zone_top.name] = (date.today(),found_date)
-                else:
-                    found_date = SentinelTileGenerator.__last_date_for_today[zone_top.name][1]
+            if zone_name is not None and zone_name != zone_bottom.name:
+                raise DataCannotBeComputed("Data not requested")
+            zone_name = zone_top.name
             if found_date is None:
-                raise DataCannotBeComputed("Impossible to find date for zone")
-
+                if zone_top.name not in SentinelTileGenerator.__last_date_for_today:
+                        found_date = last_image_date_for_zone(zone_name)
+                        SentinelTileGenerator.__last_date_for_today[zone_top.name] = (date.today(),found_date)
+                else:
+                    if SentinelTileGenerator.__last_date_for_today[zone_top.name][0] != date.today():
+                        found_date = last_image_date_for_zone(zone_name)
+                        SentinelTileGenerator.__last_date_for_today[zone_top.name] = (date.today(),found_date)
+                    else:
+                        found_date = SentinelTileGenerator.__last_date_for_today[zone_top.name][1]
+                if found_date is None:
+                    raise DataCannotBeComputed("Impossible to find date for zone")
 
             file_name = self.generate_file_name(zone_name ,found_date,tms_x,tms_y,tms_z,bands, first_clip, second_clip, third_clip)
             file_path = os.path.join(tempfile.gettempdir(), file_name)
