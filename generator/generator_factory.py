@@ -2,6 +2,7 @@
 Provide the generator inteface and the factory
 """
 import abc
+from utils.exception import GeneratorNotFound
 
 
 class Generator(abc.ABC):
@@ -63,6 +64,8 @@ class GeneratorFactory:
         """
         return the generator for the given type
         """
+        if product_type not in self.generator_map:
+            raise GeneratorNotFound("Impossible to find generator for {}".format( product_type) )
         return self.generator_map[product_type]()
 
     @staticmethod
