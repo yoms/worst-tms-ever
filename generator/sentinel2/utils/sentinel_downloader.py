@@ -50,20 +50,23 @@ def find_zone(zones_features, longitude, latitude):
     """
     Find zone for lat long
     """
-    top_x = int(longitude)
-    top_y = int(latitude)
-    if top_x in zones_features:
-        if top_y in zones_features[top_x]:
-            zone_x_tab = [zones_features[top_x - 1],
-                          zones_features[top_x], zones_features[top_x + 1]]
-            for zone_x in zone_x_tab:
-                zone_y_tab = [zone_x[top_y - 1],
-                              zone_x[top_y], zone_x[top_y + 1]]
-                for zone_y in zone_y_tab:
-                    for zone in zone_y:
-                        zone_geom = shapely.wkt.loads(zone.geometry.to_wkt())
-                        if Point(longitude, latitude).within(zone_geom):
-                            return zone
+    try:
+        top_x = int(longitude)
+        top_y = int(latitude)
+        if top_x in zones_features:
+            if top_y in zones_features[top_x]:
+                zone_x_tab = [zones_features[top_x - 1],
+                            zones_features[top_x], zones_features[top_x + 1]]
+                for zone_x in zone_x_tab:
+                    zone_y_tab = [zone_x[top_y - 1],
+                                zone_x[top_y], zone_x[top_y + 1]]
+                    for zone_y in zone_y_tab:
+                        for zone in zone_y:
+                            zone_geom = shapely.wkt.loads(zone.geometry.to_wkt())
+                            if Point(longitude, latitude).within(zone_geom):
+                                return zone
+    except Exception as err:
+        LOGGER.debug("Impossible to find zone")
     return None
 
 
