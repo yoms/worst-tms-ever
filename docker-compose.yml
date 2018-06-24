@@ -9,4 +9,4 @@ services:
     ports: 
      - "8080:80"
     environment: 
-     - "TILESERVER=http://localhost:5000/sentinel2/{x}/{y}/{z}"
+     - "TILESERVER=http://localhost:5000/sentinel2/{x}/{y}/{z}?zone=31TCJ&date=20180620"
