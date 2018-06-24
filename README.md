@@ -26,11 +26,13 @@ The processing can be configure by the request:
 
 <http://localhost:5000/sentinel2/{x}/{y}/{z}?first_clip=500,8500&third_clip=500,8500&second_clip=500,8500>
 
+<http://localhost:5000/sentinel2/{x}/{y}/{z}?zone=31TCJ&date=20180620>
+
 ## Docker-compose
 
 Use docker-compose for testing:
 
-docker-compose up
+```docker-compose up```
 
 Access to the map with:
 
@@ -39,6 +41,7 @@ Access to the map with:
 ## TODO
 
 - [x] Define the generator requested in the request
-- [ ] Pass argument to improve the wtmse (date of image, color clip, band used)
-- [ ] Handle error properly in generators
+- [x] Pass argument to improve the wtmse (date of image, color clip, band used)
+- [x] Handle error properly in generators
+- [ ] Add the possibility to configure generator with config files or env var
 - [ ] Write readme for real
