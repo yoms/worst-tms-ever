@@ -9,6 +9,8 @@ ADD wtmse.py /app/wtmse.py
 ADD generator /app/generator
 ADD utils /app/utils
 
+EXPOSE 5000
+
 RUN cd /app/generator/sentinel2/utils/data/ && unzip S2A_OPER.kml.zip
 
 WORKDIR /app/
