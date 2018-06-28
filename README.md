@@ -51,3 +51,4 @@ Access to the map with:
 - [ ] Implement google_bucket_sentinel_downloader
 - [ ] Change thread poll to process poll, because of GIL ()
 - [ ] Define min and max Z by ENV var instead of hard wrinting in code.
+- [ ] Looking if decorator is better than sentinel2/__init__.py way to register in generator factory
