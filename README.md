@@ -45,3 +45,9 @@ Access to the map with:
 - [x] Handle error properly in generators
 - [ ] Add the possibility to configure generator with config files or env var
 - [ ] Write readme for real
+- [ ] Use TCI instead of compose image in no band ask case
+- [ ] Change sentinel downloader in abstract class and implement local_sentinel_downloader
+- [ ] Implement amazon_bucket_sentinel_downloader
+- [ ] Implement google_bucket_sentinel_downloader
+- [ ] Change thread poll to process poll, because of GIL ()
+- [ ] Define min and max Z by ENV var instead of hard wrinting in code.
