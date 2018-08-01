@@ -148,7 +148,7 @@ def get_x_y_for_lon_lat(raster_file, lon, lat):
 
     return (int(point_x), int(point_y))
 
-def extract_tile(img_path, top_left, top_right, bottom_left, bottom_right, out_path, x_out_size = 512, y_out_size = 512):
+def extract_tile(bands_data, top_left, top_right, bottom_left, bottom_right, out_path, x_out_size = 512, y_out_size = 512):
     """
     Extract tile from the image
     """
@@ -177,19 +177,16 @@ def extract_tile(img_path, top_left, top_right, bottom_left, bottom_right, out_p
     x_clip  = int((x_max - x_min)*tan(rotation_angle_tan))
 
     LOGGER.debug("Extract tile")
-    LOGGER.debug("Image path : %s", img_path)
     LOGGER.debug("Extract data from table")
     LOGGER.debug("Min x : %s", x_min)
     LOGGER.debug("Max x : %s", x_max)
     LOGGER.debug("Min y : %s", y_min)
     LOGGER.debug("Max y : %s", y_max)
-    img = scipy.misc.imread(img_path)
 
-
-    y_min = max(0, min(y_min, len(img)))
-    y_max = max(0, min(y_max, len(img)))
-    x_min = max(0, min(x_min, len(img[0])))
-    x_max = max(0, min(x_max, len(img[0])))
+    y_min = max(0, min(y_min, len(bands_data[0])))
+    y_max = max(0, min(y_max, len(bands_data[0])))
+    x_min = max(0, min(x_min, len(bands_data[0][0])))
+    x_max = max(0, min(x_max, len(bands_data[0][0])))
 
     LOGGER.debug("After clamp")
     LOGGER.debug("Min x : %s", x_min)
@@ -197,8 +194,8 @@ def extract_tile(img_path, top_left, top_right, bottom_left, bottom_right, out_p
     LOGGER.debug("Min y : %s", y_min)
     LOGGER.debug("Max y : %s", y_max)
 
-    LOGGER.debug("Image y: %s", len(img))
-    LOGGER.debug("Image x: %s", len(img[0]))
+    LOGGER.debug("Image y: %s", len(bands_data[0]))
+    LOGGER.debug("Image x: %s", len(bands_data[0][0]))
 
     if y_max == y_min:
         LOGGER.error("After clamp, image size is Null")
@@ -211,9 +208,9 @@ def extract_tile(img_path, top_left, top_right, bottom_left, bottom_right, out_p
 
     LOGGER.debug("Load band data")
     rgb = np.zeros((size_on_y, size_on_x, 3), dtype=np.uint8)
-    rgb[..., 0] = img[y_min:y_max, x_min:x_max, 0]
-    rgb[..., 1] = img[y_min:y_max, x_min:x_max, 1]
-    rgb[..., 2] = img[y_min:y_max, x_min:x_max, 2]
+    rgb[..., 0] = bands_data[0][y_min:y_max, x_min:x_max]
+    rgb[..., 1] = bands_data[1][y_min:y_max, x_min:x_max]
+    rgb[..., 2] = bands_data[2][y_min:y_max, x_min:x_max]
     LOGGER.debug("Write tile in output file %s", out_path)
     transformed_img = rotate(rgb, -rotation_angle_degrees, resize=True, clip=False)
     opposite_lenght = int(fabs(opposite_lenght))
