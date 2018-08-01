@@ -26,12 +26,14 @@ def create_raster_from_band(red, green, blue, output_file):
 
     dst_ds.SetGeoTransform(red_ds.GetGeoTransform())
     dst_ds.SetProjection(red_ds.GetProjection())
+    del red_ds
 
     def write_band(band, index_band):
         LOGGER.debug("Write band : %s", index_band)
         band_ds = gdal.Open(band)
         array = band_ds.GetRasterBand(1).ReadAsArray()
         dst_ds.GetRasterBand(index_band).WriteArray(array)
+        del band_ds
 
     write_band(red, 1)
     write_band(blue, 2)
@@ -82,6 +84,8 @@ def create_png_from_raster(raster_file, output_file, blue_clip=(0., 2500.), red_
     green_array = clip_array(2, green_clip)
     LOGGER.debug("Prepare blue color, clip raw value at %s, %s", blue_clip[0], blue_clip[1])
     blue_array = clip_array(3, blue_clip)
+
+    del raster_ds
 
     rgb = np.zeros((len(red_array), len(red_array[0]), 3), dtype=np.uint8)
     rgb[..., 0] = red_array
@@ -140,6 +144,7 @@ def get_x_y_for_lon_lat(raster_file, lon, lat):
     point_y = floor(point_y) if point_y-floor(point_y) < 0.5 else floor(point_y + 1)
     LOGGER.debug("Point x : %s", point_x)
     LOGGER.debug("Point y : %s", point_y)
+    del raster_ds
 
     return (int(point_x), int(point_y))
 
@@ -204,6 +209,7 @@ def extract_tile(img_path, top_left, top_right, bottom_left, bottom_right, out_p
     size_on_x = (x_max - x_min)
     size_on_y = (y_max - y_min)
 
+    LOGGER.debug("Load band data")
     rgb = np.zeros((size_on_y, size_on_x, 3), dtype=np.uint8)
     rgb[..., 0] = img[y_min:y_max, x_min:x_max, 0]
     rgb[..., 1] = img[y_min:y_max, x_min:x_max, 1]
