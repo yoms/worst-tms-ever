@@ -1,4 +1,4 @@
-version: '2'
+version: '3.1'
 services:
   wtmse:
     image: "yoms/worst-tms-ever"
