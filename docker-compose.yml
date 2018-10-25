@@ -1,12 +1,20 @@
 version: '3.1'
 services:
+  reverse-proxy:
+    image: traefik 
+    command: --api --docker 
+    ports:
+      - "85:80"     
+      - "8085:8080" 
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock 
   wtmse:
     image: "yoms/worst-tms-ever"
-    ports:
-     - "5000:5000"
+    labels:
+      - "traefik.frontend.rule=PathPrefix:/sentinel2"
   leaflet:
     image: "yoms/nginx-leaflet"
-    ports: 
-     - "8080:80"
     environment: 
-     - "TILESERVER=http://localhost:5000/sentinel2/{x}/{y}/{z}?zone=31TCJ&date=20180620"
+     - "TILESERVER=/sentinel2/{x}/{y}/{z}?zone=31TCJ&date=20180620"
+    labels:
+      - "traefik.frontend.rule=Path:/,/autosize.js"
