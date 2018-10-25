@@ -4,6 +4,8 @@ This python flask server, serv TMS data from copernicus raster, its the worst TM
 
 For now the server take the last image found and create a tile from it.
 
+[![Try in PWD](https://github.com/play-with-docker/stacks/raw/cff22438cb4195ace27f9b15784bbb497047afa7/assets/images/button.png)](http://play-with-docker.com?stack=https://raw.githubusercontent.com/yoms/worst-tms-ever/master/docker-compose.yml)
+
 ## Caution
 
 Unzip ./generator/sentinel2/utils/data/S2A_OPER.kml.zip before use
