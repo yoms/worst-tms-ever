@@ -6,7 +6,7 @@ import tempfile
 import logging
 from threading import Thread
 from queue import Queue
-from .utils.sentinel_downloader import download_product_in_zone
+from .sentinel_product_provider import SentinelProductProvider, SentinelProductDownloader
 from .utils.tile_generator import get_x_y_for_lon_lat, create_raster_from_band, extract_tile, create_png_from_raster
 
 
@@ -26,6 +26,7 @@ class Tile:
         self.first_clip = first_clip
         self.second_clip = second_clip
         self.third_clip = third_clip
+        self.bands_path = None
 
 
 class SentinelImageProducer(Thread):
@@ -35,6 +36,7 @@ class SentinelImageProducer(Thread):
 
     tile_to_product = Queue()
     __sentinel_tile_produce_instance = None
+    ProductProviderClass = None
 
     def __init__(self):
         """
@@ -73,7 +75,8 @@ class SentinelImageProducer(Thread):
                 third_clip = tile.third_clip
 
                 if not os.path.isfile(file_path):
-                    bands = download_product_in_zone(zone_name, found_date, tile_bands)
+                    product_provider = SentinelImageProducer.ProductProviderClass()
+                    bands = product_provider.find_product_in_zone(zone_name, found_date, tile_bands)
                     tiff_name = zone_name + "_" + \
                         str(found_date.year) + "_" + \
                         str(found_date.month) + "_" + str(found_date.day) + \

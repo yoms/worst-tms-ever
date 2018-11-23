@@ -11,8 +11,9 @@ from datetime import date
 from generator.generator_factory import Generator
 from utils.tms_helper import bbox_from_xyz
 from utils.exception import DataCannotBeComputed, DataNotYetReady
-from .utils.sentinel_downloader import read_zones_from_data_file, find_zone, last_image_date_for_zone
+from .utils.sentinel_downloader import read_zones_from_data_file, find_zone
 from .sentinel_tile_producer import Tile, SentinelImageProducer
+from .sentinel_product_provider import SentinelProductProvider, SentinelProductDownloader
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -25,6 +26,7 @@ class SentinelTileGenerator(Generator):
     Sentinel tile generator, implement the tile generator interface for copernicus S2 data
     """
     __last_date_for_today = {}
+    ProductProviderClass = None
 
     def __init__(self):
         """
@@ -34,6 +36,8 @@ class SentinelTileGenerator(Generator):
         self.__error_file = os.path.join(self.__dir_path, 'data', 'error.jpg')
         self.__fake_file = os.path.join(self.__dir_path, 'data', 'fake.jpg')
         self.__blank_file = os.path.join(self.__dir_path, 'data', 'blank.png')
+        self.product_provider = SentinelTileGenerator.ProductProviderClass()
+        SentinelImageProducer.ProductProviderClass = SentinelTileGenerator.ProductProviderClass
 
     def get_data_not_yet_ready_file(self):
         LOGGER.debug("Data not yet ready, send %s", self.__blank_file)
@@ -91,6 +95,7 @@ class SentinelTileGenerator(Generator):
         """
         generate tile implementation, use an sentinel tile producer to treat data
         """
+
         if (tms_z < 9) or (tms_z > 14):
             LOGGER.debug("Image shall be between 9 < z < 14 ")
             raise DataCannotBeComputed("Image shall be between 9 < z < 14 ")
@@ -112,11 +117,11 @@ class SentinelTileGenerator(Generator):
             zone_name = zone_top.name
             if found_date is None:
                 if zone_top.name not in SentinelTileGenerator.__last_date_for_today:
-                        found_date = last_image_date_for_zone(zone_name)
+                        found_date = self.product_provider.last_image_date_for_zone(zone_name)
                         SentinelTileGenerator.__last_date_for_today[zone_top.name] = (date.today(),found_date)
                 else:
                     if SentinelTileGenerator.__last_date_for_today[zone_top.name][0] != date.today():
-                        found_date = last_image_date_for_zone(zone_name)
+                        found_date = self.product_provider.last_image_date_for_zone(zone_name)
                         SentinelTileGenerator.__last_date_for_today[zone_top.name] = (date.today(),found_date)
                     else:
                         found_date = SentinelTileGenerator.__last_date_for_today[zone_top.name][1]
