@@ -39,7 +39,7 @@ def get_request_handler(generator_name, x_coordinate, y_coordinate, z_coordinate
     except DataCannotBeComputed as err:
         tile = generator.get_error_file()
         LOGGER.debug("File cannot be found, return error file %s", tile)
-        return send_file(tile, mimetype='image/png', cache_timeout=10)
+        return 404
     except DataNotYetReady as err:
         tile = generator.get_data_not_yet_ready_file()
         LOGGER.debug("File not yet ready, return error file %s", tile)
