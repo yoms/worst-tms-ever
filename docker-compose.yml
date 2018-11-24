@@ -1,5 +1,9 @@
 version: '3.1'
 services:
+  wmtse-data:
+    image: "yoms/worst-tms-ever-data"
+    volumes:
+      - data:/tmp
   reverse-proxy:
     image: traefik 
     command: --api --docker 
@@ -15,9 +19,14 @@ services:
     environment: 
       - WTMSE_PEPSSENTINELPRODUCTDOWNLOADER_USER=worsttmsever@gmail.com
       - WTMSE_PEPSSENTINELPRODUCTDOWNLOADER_PASSWORD=RcUjCb9kJ236
+    volumes: 
+      - data:/tmp
   leaflet:
     image: "yoms/nginx-leaflet"
     environment: 
      - "TILESERVER=/sentinel2/{x}/{y}/{z}?zone=31TCJ&date=20180620"
     labels:
       - "traefik.frontend.rule=Path:/,/autosize.js"
+
+volumes: 
+  data:
