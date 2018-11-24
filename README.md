@@ -37,7 +37,9 @@ Use docker-compose for testing:
 
 Access to the map with:
 
-<http://localhost:8080>
+<http://localhost:85>
+
+The data are pre-downloaded and work only on few tiles
 
 ## TODO
 
