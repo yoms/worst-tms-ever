@@ -36,8 +36,8 @@ def create_raster_from_band(red, green, blue, output_file):
         del band_ds
 
     write_band(red, 1)
-    write_band(blue, 2)
-    write_band(green, 3)
+    write_band(green, 2)
+    write_band(blue, 3)
 
     dst_ds.FlushCache()
 

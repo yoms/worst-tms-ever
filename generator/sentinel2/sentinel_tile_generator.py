@@ -63,7 +63,7 @@ class SentinelTileGenerator(Generator):
         """
         Parse argument function
         """
-        bands = [2, 3, 4]
+        bands = [4,3,2]
         first_clip = (0., 2500.)
         second_clip = first_clip
         third_clip = first_clip
@@ -71,7 +71,7 @@ class SentinelTileGenerator(Generator):
         date_requested = None
 
         if 'bands' in arguments:
-            bands = list(map(int,arguments.get('bands', '2,3,4').split(',')))
+            bands = list(map(int,arguments.get('bands', '4,3,2').split(',')))
 
         def parse_clip(arg_string):        
             if arg_string in arguments:
