@@ -8,6 +8,7 @@ import logging
 from flask import Flask
 from flask import send_file
 from flask import request
+from flask import abort
 from generator.generator_factory import GeneratorFactory
 from utils.exception import DataCannotBeComputed, DataNotYetReady, GeneratorNotFound
 
@@ -31,7 +32,7 @@ def get_request_handler(generator_name, x_coordinate, y_coordinate, z_coordinate
         generator = GeneratorFactory.get_instance().build_generator(generator_name)
     except GeneratorNotFound as err:
         LOGGER.error("Impossible to find generator", generator_name)
-        return 404
+        return abort(404)
     try:
         tile = generator.generate_tile(x_coordinate, y_coordinate, z_coordinate, request.args)
         LOGGER.debug("File found, file %s", tile)
@@ -39,13 +40,13 @@ def get_request_handler(generator_name, x_coordinate, y_coordinate, z_coordinate
     except DataCannotBeComputed as err:
         tile = generator.get_error_file()
         LOGGER.debug("File cannot be found, return error file %s", tile)
-        return 404
+        return abort(404)
     except DataNotYetReady as err:
         tile = generator.get_data_not_yet_ready_file()
         LOGGER.debug("File not yet ready, return error file %s", tile)
         return send_file(tile, mimetype='image/png', cache_timeout=10)
     except Exception as err:
-        return 404
+        return abort(404)
 
 
 if __name__ == '__main__':
