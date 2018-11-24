@@ -1,8 +1,8 @@
 from generator import generator_factory
 from generator.sentinel2.sentinel_tile_generator import SentinelTileGenerator
 from generator.sentinel2.sentinel_tile_producer import SentinelTileProducer
-from generator.sentinel2.sentinel_product_provider import SentinelProductProvider, SentinelProductDownloader
+from generator.sentinel2.sentinel_product_provider import SentinelProductProvider, PEPSSentinelProductDownloader
 
 generator_factory = generator_factory.GeneratorFactory.get_instance()
-SentinelTileGenerator.ProductProviderClass = SentinelProductDownloader
+SentinelTileGenerator.ProductProviderClass = PEPSSentinelProductDownloader
 generator_factory.register_generator(SentinelTileGenerator)

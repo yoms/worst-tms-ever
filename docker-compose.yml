@@ -12,6 +12,9 @@ services:
     image: "yoms/worst-tms-ever"
     labels:
       - "traefik.frontend.rule=PathPrefix:/sentinel2"
+    environment: 
+      - WTMSE_PEPSSENTINELPRODUCTDOWNLOADER_USER=worsttmsever@gmail.com
+      - WTMSE_PEPSSENTINELPRODUCTDOWNLOADER_PASSWORD=RcUjCb9kJ236
   leaflet:
     image: "yoms/nginx-leaflet"
     environment: 
