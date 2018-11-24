@@ -24,7 +24,10 @@ services:
   leaflet:
     image: "yoms/nginx-leaflet"
     environment: 
-     - "TILESERVER=/sentinel2/{x}/{y}/{z}?zone=31TCJ&date=20180620"
+     - "TILESERVER=http://{s}.tile.stamen.com/terrain/{z}/{x}/{y}.png"
+     - "ATTRIBUTION=MapQuest"
+     - "TILESERVER2=/sentinel2/{x}/{y}/{z}?zone=31TCJ&date=20180620"
+     - "ATTRIBUTION2=wtmse"
     labels:
       - "traefik.frontend.rule=Path:/,/autosize.js"
 
